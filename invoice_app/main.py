@@ -41,6 +41,7 @@ class InvoiceApp:
     def __init__(self) -> None:
         self.root = tk.Tk()
         self.root.title("Generador de facturas - Agrícola León Lara S.C.")
+        self._prepare_window()
         self._setup_style()
         self.items: List[InvoiceItem] = []
 
@@ -68,6 +69,27 @@ class InvoiceApp:
         self._update_totals()
 
     # region GUI construction
+    def _prepare_window(self) -> None:
+        """Configure initial window geometry so the layout isn't clipped."""
+        # Ensure a sensible default size even before widgets are rendered.
+        default_width = 1280
+        default_height = 820
+        screen_width = self.root.winfo_screenwidth()
+        screen_height = self.root.winfo_screenheight()
+        width = min(default_width, max(1024, screen_width - 80))
+        height = min(default_height, max(720, screen_height - 100))
+        self.root.geometry(f"{width}x{height}")
+        self.root.minsize(1024, 720)
+
+        # Try to maximize on platforms that support it, especially on Windows.
+        try:
+            self.root.state("zoomed")
+        except tk.TclError:
+            try:
+                self.root.attributes("-zoomed", True)
+            except tk.TclError:
+                pass
+
     def _setup_style(self) -> None:
         self.root.configure(bg="#eef2f7")
         style = ttk.Style(self.root)
