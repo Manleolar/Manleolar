@@ -6,6 +6,12 @@ Bienvenido al GitHub de Manuel León Lara.
 
 Este repositorio contiene una pequeña aplicación de escritorio hecha con Python y Tkinter para generar facturas de Agrícola León Lara S.C. Permite introducir los datos del cliente, las líneas de la factura y exportar el resultado a PDF con el formato corporativo.
 
+## Características destacadas
+
+- Interfaz moderna con cabecera corporativa, tarjetas y campos estilizados para que introducir datos resulte más agradable.
+- Panel de totales con tarjetas dinámicas que recalculan automáticamente la base imponible, IVA, retención y total de la factura.
+- Exportación profesional a PDF con maquetación optimizada para que los textos largos respeten los márgenes y se distribuyan correctamente.
+
 ## Requisitos
 
 - Python 3.10 o superior (solo necesario para preparar el entorno y generar el ejecutable).
