@@ -41,7 +41,6 @@ class InvoiceApp:
     def __init__(self) -> None:
         self.root = tk.Tk()
         self.root.title("Generador de facturas - Agrícola León Lara S.C.")
-        self._setup_style()
         self.items: List[InvoiceItem] = []
 
         self.invoice_number_var = tk.StringVar(value="1")
@@ -68,89 +67,8 @@ class InvoiceApp:
         self._update_totals()
 
     # region GUI construction
-    def _setup_style(self) -> None:
-        self.root.configure(bg="#eef2f7")
-        style = ttk.Style(self.root)
-        try:
-            style.theme_use("clam")
-        except tk.TclError:
-            pass
-
-        style.configure("Content.TFrame", background="#eef2f7")
-        style.configure(
-            "Card.TFrame",
-            background="#ffffff",
-            relief="solid",
-            bordercolor="#d4d9e2",
-            borderwidth=1,
-            padding=15,
-        )
-        style.configure("CardBody.TFrame", background="#ffffff")
-        style.configure(
-            "CardHeading.TLabel",
-            font=("Segoe UI", 12, "bold"),
-            foreground="#1f2933",
-            background="#ffffff",
-        )
-        style.configure(
-            "Muted.TLabel",
-            font=("Segoe UI", 9),
-            foreground="#52606d",
-            background="#ffffff",
-        )
-        style.configure(
-            "LargeValue.TLabel",
-            font=("Segoe UI", 13, "bold"),
-            foreground="#0f766e",
-            background="#ffffff",
-        )
-        style.configure(
-            "Accent.TButton",
-            font=("Segoe UI", 10, "bold"),
-            foreground="#ffffff",
-            background="#2563eb",
-            borderwidth=0,
-            padding=(12, 8),
-        )
-        style.map(
-            "Accent.TButton",
-            background=[("active", "#1d4ed8"), ("disabled", "#9aa5b1")],
-        )
-        style.configure(
-            "Secondary.TButton",
-            font=("Segoe UI", 10),
-            background="#e0e7ff",
-            foreground="#1e3a8a",
-            borderwidth=0,
-            padding=(12, 8),
-        )
-        style.map(
-            "Secondary.TButton",
-            background=[("active", "#c7d2fe"), ("disabled", "#e4e7eb")],
-        )
-        style.configure(
-            "Modern.Treeview",
-            background="#ffffff",
-            fieldbackground="#ffffff",
-            highlightthickness=0,
-            rowheight=28,
-            font=("Segoe UI", 10),
-        )
-        style.configure(
-            "Modern.Treeview.Heading",
-            font=("Segoe UI", 10, "bold"),
-            background="#f3f4f6",
-            foreground="#1f2933",
-            relief="flat",
-        )
-        style.map(
-            "Modern.Treeview",
-            background=[("selected", "#2563eb")],
-            foreground=[("selected", "#ffffff")],
-        )
-
     def _build_interface(self) -> None:
-        content = ttk.Frame(self.root, padding=20, style="Content.TFrame")
+        content = ttk.Frame(self.root, padding=15)
         content.grid(column=0, row=0, sticky="nsew")
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
@@ -163,157 +81,118 @@ class InvoiceApp:
         self._build_actions(content)
 
     def _build_invoice_meta(self, parent: ttk.Frame) -> None:
-        meta_frame = ttk.Frame(parent, style="Card.TFrame")
-        meta_frame.grid(column=0, row=0, columnspan=2, sticky="ew", pady=(0, 20))
-        for col in range(4):
-            meta_frame.columnconfigure(col, weight=1, uniform="meta")
+        meta_frame = ttk.LabelFrame(parent, text="Datos de la factura")
+        meta_frame.grid(column=0, row=0, columnspan=2, sticky="ew", pady=(0, 10))
+        meta_frame.columnconfigure(1, weight=1)
 
-        ttk.Label(meta_frame, text="Datos de la factura", style="CardHeading.TLabel").grid(
-            column=0, row=0, columnspan=4, sticky="w", pady=(0, 10)
-        )
+        ttk.Label(meta_frame, text="Número de factura:").grid(column=0, row=0, sticky="w", padx=5, pady=5)
+        ttk.Entry(meta_frame, textvariable=self.invoice_number_var).grid(column=1, row=0, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(meta_frame, text="Número de factura:").grid(column=0, row=1, sticky="w", pady=5)
-        ttk.Entry(meta_frame, textvariable=self.invoice_number_var).grid(column=0, row=2, sticky="ew", pady=(0, 10))
+        ttk.Label(meta_frame, text="Fecha:").grid(column=2, row=0, sticky="w", padx=5, pady=5)
+        ttk.Entry(meta_frame, textvariable=self.invoice_date_var).grid(column=3, row=0, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(meta_frame, text="Fecha:").grid(column=1, row=1, sticky="w", pady=5)
-        ttk.Entry(meta_frame, textvariable=self.invoice_date_var).grid(column=1, row=2, sticky="ew", pady=(0, 10))
-
-        ttk.Label(meta_frame, text="Campaña / Concepto:").grid(column=0, row=3, sticky="w", pady=5)
-        ttk.Entry(meta_frame, textvariable=self.campaign_var).grid(column=0, row=4, columnspan=4, sticky="ew")
+        ttk.Label(meta_frame, text="Campaña / Concepto:").grid(column=0, row=1, sticky="w", padx=5, pady=5)
+        ttk.Entry(meta_frame, textvariable=self.campaign_var).grid(column=1, row=1, columnspan=3, sticky="ew", padx=5, pady=5)
 
     def _build_customer_section(self, parent: ttk.Frame) -> None:
-        customer_frame = ttk.Frame(parent, style="Card.TFrame")
-        customer_frame.grid(column=0, row=1, columnspan=2, sticky="ew", pady=(0, 20))
-        ttk.Label(customer_frame, text="Datos del cliente", style="CardHeading.TLabel").grid(
-            column=0, row=0, columnspan=4, sticky="w", pady=(0, 10)
-        )
+        customer_frame = ttk.LabelFrame(parent, text="Datos del cliente")
+        customer_frame.grid(column=0, row=1, columnspan=2, sticky="ew", pady=(0, 10))
         for col in range(4):
             customer_frame.columnconfigure(col, weight=1)
 
-        ttk.Label(customer_frame, text="Nombre / Razón social:").grid(column=0, row=1, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.customer_name_var).grid(column=0, row=2, columnspan=4, sticky="ew", pady=(0, 10))
+        ttk.Label(customer_frame, text="Nombre / Razón social:").grid(column=0, row=0, sticky="w", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.customer_name_var).grid(column=1, row=0, columnspan=3, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(customer_frame, text="NIF / CIF:").grid(column=0, row=3, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.customer_tax_id_var).grid(column=0, row=4, sticky="ew", pady=(0, 10))
+        ttk.Label(customer_frame, text="NIF / CIF:").grid(column=0, row=1, sticky="w", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.customer_tax_id_var).grid(column=1, row=1, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(customer_frame, text="Dirección:").grid(column=1, row=3, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.customer_address_var).grid(column=1, row=4, columnspan=3, sticky="ew", pady=(0, 10))
+        ttk.Label(customer_frame, text="Dirección:").grid(column=0, row=2, sticky="w", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.customer_address_var).grid(column=1, row=2, columnspan=3, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(customer_frame, text="Ciudad:").grid(column=0, row=5, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.customer_city_var).grid(column=0, row=6, sticky="ew", pady=(0, 10))
+        ttk.Label(customer_frame, text="Ciudad:").grid(column=0, row=3, sticky="w", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.customer_city_var).grid(column=1, row=3, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(customer_frame, text="Código postal:").grid(column=1, row=5, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.customer_postal_code_var).grid(column=1, row=6, sticky="ew", pady=(0, 10))
+        ttk.Label(customer_frame, text="Código postal:").grid(column=2, row=3, sticky="w", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.customer_postal_code_var).grid(column=3, row=3, sticky="ew", padx=5, pady=5)
 
-        ttk.Label(customer_frame, text="Notas para el pie de factura:").grid(column=0, row=7, sticky="w", pady=5)
-        ttk.Entry(customer_frame, textvariable=self.notes_var).grid(column=0, row=8, columnspan=4, sticky="ew")
+        ttk.Label(customer_frame, text="Notas para el pie de factura:").grid(column=0, row=4, sticky="nw", padx=5, pady=5)
+        ttk.Entry(customer_frame, textvariable=self.notes_var).grid(column=1, row=4, columnspan=3, sticky="ew", padx=5, pady=5)
 
     def _build_items_section(self, parent: ttk.Frame) -> None:
-        items_frame = ttk.Frame(parent, style="Card.TFrame")
-        items_frame.grid(column=0, row=2, columnspan=2, sticky="nsew", pady=(0, 20))
+        items_frame = ttk.LabelFrame(parent, text="Líneas de factura")
+        items_frame.grid(column=0, row=2, columnspan=2, sticky="nsew", pady=(0, 10))
         parent.rowconfigure(2, weight=1)
         items_frame.columnconfigure(0, weight=1)
 
-        ttk.Label(items_frame, text="Líneas de factura", style="CardHeading.TLabel").grid(
-            column=0, row=0, sticky="w", pady=(0, 10)
-        )
-
-        form_frame = ttk.Frame(items_frame, style="CardBody.TFrame")
-        form_frame.configure(padding=(0, 10, 0, 10))
-        form_frame.grid(column=0, row=1, sticky="ew")
+        form_frame = ttk.Frame(items_frame)
+        form_frame.grid(column=0, row=0, sticky="ew", padx=5, pady=5)
         for col in range(3):
             form_frame.columnconfigure(col, weight=1)
 
-        ttk.Label(form_frame, text="Cantidad (kgs, h, etc.):").grid(column=0, row=0, sticky="w", pady=2)
-        ttk.Entry(form_frame, textvariable=self.item_quantity_var).grid(column=0, row=1, sticky="ew", pady=(0, 8))
+        ttk.Label(form_frame, text="Cantidad (kgs, h, etc.):").grid(column=0, row=0, sticky="w", padx=5, pady=2)
+        ttk.Entry(form_frame, textvariable=self.item_quantity_var).grid(column=0, row=1, sticky="ew", padx=5, pady=2)
 
-        ttk.Label(form_frame, text="Descripción:").grid(column=1, row=0, sticky="w", pady=2)
-        ttk.Entry(form_frame, textvariable=self.item_description_var).grid(column=1, row=1, sticky="ew", pady=(0, 8))
+        ttk.Label(form_frame, text="Descripción:").grid(column=1, row=0, sticky="w", padx=5, pady=2)
+        ttk.Entry(form_frame, textvariable=self.item_description_var).grid(column=1, row=1, sticky="ew", padx=5, pady=2)
 
-        ttk.Label(form_frame, text="Precio unitario (€):").grid(column=2, row=0, sticky="w", pady=2)
-        ttk.Entry(form_frame, textvariable=self.item_unit_price_var).grid(column=2, row=1, sticky="ew", pady=(0, 8))
+        ttk.Label(form_frame, text="Precio unitario (€):").grid(column=2, row=0, sticky="w", padx=5, pady=2)
+        ttk.Entry(form_frame, textvariable=self.item_unit_price_var).grid(column=2, row=1, sticky="ew", padx=5, pady=2)
 
-        button_frame = ttk.Frame(items_frame, style="CardBody.TFrame")
-        button_frame.grid(column=0, row=2, sticky="ew", pady=(0, 10))
-        ttk.Button(button_frame, text="Añadir línea", style="Accent.TButton", command=self._add_item).grid(
-            column=0, row=0, padx=(0, 10), pady=5, sticky="w"
-        )
-        ttk.Button(
-            button_frame,
-            text="Eliminar seleccionada",
-            style="Secondary.TButton",
-            command=self._remove_selected_item,
-        ).grid(column=1, row=0, pady=5, sticky="w")
+        button_frame = ttk.Frame(items_frame)
+        button_frame.grid(column=0, row=1, sticky="ew", padx=5)
+        ttk.Button(button_frame, text="Añadir línea", command=self._add_item).grid(column=0, row=0, padx=5, pady=5, sticky="w")
+        ttk.Button(button_frame, text="Eliminar seleccionada", command=self._remove_selected_item).grid(column=1, row=0, padx=5, pady=5, sticky="w")
 
         columns = ("quantity", "description", "unit_price", "total")
-        self.tree = ttk.Treeview(items_frame, columns=columns, show="headings", height=8, style="Modern.Treeview")
+        self.tree = ttk.Treeview(items_frame, columns=columns, show="headings", height=6)
         self.tree.heading("quantity", text="Cantidad")
         self.tree.heading("description", text="Descripción")
         self.tree.heading("unit_price", text="Precio unitario")
         self.tree.heading("total", text="Importe")
-        self.tree.column("quantity", width=110, anchor="center")
-        self.tree.column("description", width=360, anchor="w")
-        self.tree.column("unit_price", width=140, anchor="e")
-        self.tree.column("total", width=140, anchor="e")
-        self.tree.grid(column=0, row=3, sticky="nsew")
+        self.tree.column("quantity", width=120, anchor="center")
+        self.tree.column("description", width=300, anchor="w")
+        self.tree.column("unit_price", width=120, anchor="e")
+        self.tree.column("total", width=120, anchor="e")
+        self.tree.grid(column=0, row=2, sticky="nsew", padx=5, pady=5)
 
         scrollbar = ttk.Scrollbar(items_frame, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscroll=scrollbar.set)
-        scrollbar.grid(column=1, row=3, sticky="ns")
-        items_frame.rowconfigure(3, weight=1)
+        scrollbar.grid(column=1, row=2, sticky="ns")
+        items_frame.rowconfigure(2, weight=1)
 
     def _build_totals_section(self, parent: ttk.Frame) -> None:
-        totals_frame = ttk.Frame(parent, style="Card.TFrame")
-        totals_frame.grid(column=0, row=3, sticky="nsew", padx=(0, 20))
+        totals_frame = ttk.LabelFrame(parent, text="Totales")
+        totals_frame.grid(column=0, row=3, sticky="nsew", padx=(0, 10))
         parent.columnconfigure(0, weight=1)
-        totals_frame.columnconfigure(0, weight=1)
-        totals_frame.columnconfigure(1, weight=1)
-
-        ttk.Label(totals_frame, text="Totales", style="CardHeading.TLabel").grid(
-            column=0, row=0, columnspan=2, sticky="w", pady=(0, 10)
-        )
-
-        ttk.Label(totals_frame, text="Base imponible (€):", style="Muted.TLabel").grid(
-            column=0, row=1, sticky="w"
-        )
-        self.base_amount_label = ttk.Label(totals_frame, text="0,00", style="Muted.TLabel")
-        self.base_amount_label.grid(column=1, row=1, sticky="e")
-
-        controls_frame = ttk.Frame(totals_frame, style="CardBody.TFrame")
-        controls_frame.grid(column=0, row=2, columnspan=2, sticky="ew", pady=(10, 0))
         for col in range(2):
-            controls_frame.columnconfigure(col, weight=1)
+            totals_frame.columnconfigure(col, weight=1)
 
-        ttk.Label(controls_frame, text="IVA %").grid(column=0, row=0, sticky="w")
-        vat_entry = ttk.Entry(controls_frame, textvariable=self.vat_rate_var, width=6)
-        vat_entry.grid(column=0, row=1, sticky="w", pady=(2, 6))
-        self.vat_amount_label = ttk.Label(controls_frame, text="0,00", style="Muted.TLabel")
-        self.vat_amount_label.grid(column=0, row=2, sticky="w")
+        ttk.Label(totals_frame, text="Base imponible (€):").grid(column=0, row=0, sticky="w", padx=5, pady=5)
+        self.base_amount_label = ttk.Label(totals_frame, text="0,00")
+        self.base_amount_label.grid(column=1, row=0, sticky="e", padx=5, pady=5)
 
-        ttk.Label(controls_frame, text="Retención IRPF %").grid(column=1, row=0, sticky="w")
-        withholding_entry = ttk.Entry(controls_frame, textvariable=self.withholding_rate_var, width=6)
-        withholding_entry.grid(column=1, row=1, sticky="w", pady=(2, 6))
-        self.withholding_amount_label = ttk.Label(controls_frame, text="0,00", style="Muted.TLabel")
-        self.withholding_amount_label.grid(column=1, row=2, sticky="w")
+        ttk.Label(totals_frame, text="IVA %:").grid(column=0, row=1, sticky="w", padx=5, pady=5)
+        vat_entry = ttk.Entry(totals_frame, textvariable=self.vat_rate_var, width=6)
+        vat_entry.grid(column=0, row=2, sticky="w", padx=5)
+        self.vat_amount_label = ttk.Label(totals_frame, text="0,00")
+        self.vat_amount_label.grid(column=1, row=2, sticky="e", padx=5)
 
-        ttk.Separator(totals_frame).grid(column=0, row=3, columnspan=2, sticky="ew", pady=10)
+        ttk.Label(totals_frame, text="Retención IRPF %:").grid(column=0, row=3, sticky="w", padx=5, pady=5)
+        withholding_entry = ttk.Entry(totals_frame, textvariable=self.withholding_rate_var, width=6)
+        withholding_entry.grid(column=0, row=4, sticky="w", padx=5)
+        self.withholding_amount_label = ttk.Label(totals_frame, text="0,00")
+        self.withholding_amount_label.grid(column=1, row=4, sticky="e", padx=5)
 
-        ttk.Label(totals_frame, text="Total factura (€):", style="CardHeading.TLabel").grid(
-            column=0, row=4, sticky="w"
-        )
-        self.total_amount_label = ttk.Label(totals_frame, text="0,00", style="LargeValue.TLabel")
-        self.total_amount_label.grid(column=1, row=4, sticky="e")
+        ttk.Label(totals_frame, text="Total factura (€):", font=("TkDefaultFont", 10, "bold")).grid(column=0, row=5, sticky="w", padx=5, pady=5)
+        self.total_amount_label = ttk.Label(totals_frame, text="0,00", font=("TkDefaultFont", 10, "bold"))
+        self.total_amount_label.grid(column=1, row=5, sticky="e", padx=5, pady=5)
 
     def _build_actions(self, parent: ttk.Frame) -> None:
-        actions_frame = ttk.Frame(parent, style="Content.TFrame")
+        actions_frame = ttk.Frame(parent)
         actions_frame.grid(column=1, row=3, sticky="se")
 
-        ttk.Button(actions_frame, text="Exportar a PDF", style="Accent.TButton", command=self._export_pdf).grid(
-            column=0, row=0, padx=(0, 10), pady=5
-        )
-        ttk.Button(actions_frame, text="Salir", style="Secondary.TButton", command=self.root.quit).grid(
-            column=1, row=0, pady=5
-        )
+        ttk.Button(actions_frame, text="Exportar a PDF", command=self._export_pdf).grid(column=0, row=0, padx=5, pady=5)
+        ttk.Button(actions_frame, text="Salir", command=self.root.quit).grid(column=1, row=0, padx=5, pady=5)
 
     # endregion GUI construction
 
@@ -451,51 +330,21 @@ class InvoiceApp:
         table_top = y_client - 20
 
         # Tabla
-        table_width = width - 2 * margin
-        column_widths = [
-            table_width * 0.18,
-            table_width * 0.48,
-            table_width * 0.17,
-            table_width * 0.17,
-        ]
+        column_widths = [60 * mm, 70 * mm, 35 * mm, 35 * mm]
         headers = ["Cantidad", "Descripción", "Precio", "Importe"]
         y = self._draw_table_header(pdf, x_start, table_top, column_widths, headers)
 
         pdf.setFont("Helvetica", 10)
         for item in self.items:
-            quantity_x = x_start + column_widths[0] - 5
-            description_x = x_start + column_widths[0] + 5
-            unit_price_x = x_start + column_widths[0] + column_widths[1] + column_widths[2] - 5
-            total_x = x_start + sum(column_widths) - 5
-
-            description_lines = self._wrap_text(
-                item.description,
-                column_widths[1] - 10,
-                pdf,
-                "Helvetica",
-                10,
-            )
-            line_count = max(1, len(description_lines))
-
-            for line_index in range(line_count):
-                if y < 100:
-                    pdf.showPage()
-                    y = self._draw_table_header(pdf, x_start, height - margin, column_widths, headers)
-                    pdf.setFont("Helvetica", 10)
-
-                description_text = description_lines[line_index] if line_index < len(description_lines) else ""
-
-                if line_index == 0:
-                    pdf.drawRightString(quantity_x, y, self._format_quantity(item.quantity))
-                    pdf.drawRightString(unit_price_x, y, self._format_currency(item.unit_price))
-                    pdf.drawRightString(total_x, y, self._format_currency(item.total))
-                else:
-                    pdf.drawRightString(quantity_x, y, "")
-                    pdf.drawRightString(unit_price_x, y, "")
-                    pdf.drawRightString(total_x, y, "")
-
-                pdf.drawString(description_x, y, description_text)
-                y -= 16
+            if y < 100:
+                pdf.showPage()
+                y = self._draw_table_header(pdf, x_start, height - margin, column_widths, headers)
+                pdf.setFont("Helvetica", 10)
+            pdf.drawRightString(x_start + column_widths[0] - 5, y, self._format_quantity(item.quantity))
+            pdf.drawString(x_start + column_widths[0] + 5, y, item.description)
+            pdf.drawRightString(x_start + column_widths[0] + column_widths[1] + column_widths[2] - 5, y, self._format_currency(item.unit_price))
+            pdf.drawRightString(x_start + sum(column_widths) - 5, y, self._format_currency(item.total))
+            y -= 16
 
         if y < 120:
             pdf.showPage()
@@ -531,9 +380,7 @@ class InvoiceApp:
         totals_y -= 30
         if self.notes_var.get():
             pdf.setFont("Helvetica", 9)
-            for line in self._wrap_text(self.notes_var.get(), table_width, pdf, "Helvetica", 9):
-                pdf.drawString(x_start, totals_y, line)
-                totals_y -= 12
+            pdf.drawString(x_start, totals_y, self.notes_var.get())
 
         pdf.showPage()
         pdf.save()
@@ -550,38 +397,13 @@ class InvoiceApp:
     ) -> float:
         pdf.setFont("Helvetica-Bold", 10)
         pdf.setFillColor(colors.lightgrey)
-        pdf.rect(x_start, y - 18, sum(column_widths), 18, fill=1, stroke=0)
+        pdf.rect(x_start, y - 16, sum(column_widths), 16, fill=1, stroke=0)
         pdf.setFillColor(colors.black)
-        pdf.drawString(x_start + 5, y - 13, headers[0])
-        pdf.drawString(x_start + column_widths[0] + 5, y - 13, headers[1])
-        pdf.drawRightString(x_start + column_widths[0] + column_widths[1] + column_widths[2] - 5, y - 13, headers[2])
-        pdf.drawRightString(x_start + sum(column_widths) - 5, y - 13, headers[3])
-        return y - 24
-
-    def _wrap_text(
-        self,
-        text: str,
-        max_width: float,
-        pdf: canvas.Canvas,
-        font_name: str,
-        font_size: int,
-    ) -> List[str]:
-        pdf.setFont(font_name, font_size)
-        words = text.split()
-        if not words:
-            return [""]
-
-        lines: List[str] = []
-        current_line = words[0]
-        for word in words[1:]:
-            candidate = f"{current_line} {word}"
-            if pdf.stringWidth(candidate, font_name, font_size) <= max_width:
-                current_line = candidate
-            else:
-                lines.append(current_line)
-                current_line = word
-        lines.append(current_line)
-        return lines
+        pdf.drawString(x_start + 5, y - 12, headers[0])
+        pdf.drawString(x_start + column_widths[0] + 5, y - 12, headers[1])
+        pdf.drawRightString(x_start + column_widths[0] + column_widths[1] + column_widths[2] - 5, y - 12, headers[2])
+        pdf.drawRightString(x_start + sum(column_widths) - 5, y - 12, headers[3])
+        return y - 20
 
     def _format_currency(self, value: Decimal) -> str:
         quantized = value.quantize(Decimal("0.01"), rounding=ROUND_HALF_UP)
